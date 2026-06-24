@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <meta name="description" content="Calculez la durée d'existence de n'importe quoi avec précision">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='80' font-size='80' text-anchor='middle'>⏳</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23667eea' width='180' height='180'/><text x='90' y='140' font-size='100' fill='white' text-anchor='middle'>⏳</text></svg>">
+    <title>⏳ AppExistence - Calculatrice d'Existence</title>
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --border-color: #e0e8f0;
+            --accent-color: #667eea;
+            --accent-dark: #764ba2;
+        }
+
+        body.dark-mode {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-primary);
+        }
+
+        .settings-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+            transition: transform 0.2s;
+        }
+
+        .settings-button:hover {
+            transform: rotate(20deg) scale(1.1);
+        }
+
+        .settings-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            padding: 20px;
+        }
+
+        .settings-panel.show {
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-start;
+            padding-top: 80px;
+        }
+
+        .settings-content {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideInSettings 0.3s ease;
+        }
+
+        @keyframes slideInSettings {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .settings-section {
+            margin-bottom: 25px;
+        }
+
+        .settings-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 12px;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+
+        .toggle-input {
+            appearance: none;
+            width: 50px;
+            height: 28px;
+            background: var(--border-color);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+            position: relative;
+        }
+
+        .toggle-input:checked {
+            background: var(--accent-color);
+        }
+
+        .toggle-input::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+
+        .toggle-input:checked::before {
+            left: 24px;
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 14px;
+            margin: 8px 0;
+            font-family: inherit;
+        }
+
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .close-settings {
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-primary);
+            background: none;
+            border: none;
+        }
+
+        .close-settings:hover {
+            color: var(--accent-color);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--bg-primary);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid var(--border-color);
+        }
+
+        .label {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="date"]:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%);
+            border: none;
+            border-radius: 14px;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .button-small {
+            padding: 10px;
+            margin-top: 10px;
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+
+        .result-container {
+            background: #e8f4f8;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 6px solid var(--accent-color);
+            display: none;
+        }
+
+        body.dark-mode .result-container {
+            background: #1f3a4a;
+        }
+
+        .result-container.show {
+            display: block;
+            animation: slideInResult 0.5s ease;
+        }
+
+        @keyframes slideInResult {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-text {
+            font-size: 18px;
+            color: var(--accent-color);
+            font-weight: 600;
+            line-height: 28px;
+        }
+
+        .error {
+            background: #ffe8e8;
+            border: 2px solid #ff6b6b;
+            border-radius: 12px;
+            padding: 16px;
+            color: #c92a2a;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        body.dark-mode .error {
+            background: #3a1f1f;
+            border-color: #ff6b6b;
+            color: #ff9999;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        small {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid var(--border-color);
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .footer p {
+            margin: 0;
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 30px 20px; }
+            .title { font-size: 28px; }
+            .settings-content { max-width: 90%; }
+        }
+    </style>
+</head>
+<body>
+    <button class="settings-button" onclick="toggleSettings()">⚙️</button>
+
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-content">
+            <button class="close-settings" onclick="toggleSettings()">✕</button>
+            
+            <div class="settings-section">
+                <h3>🎨 Thème</h3>
+                <div class="toggle-switch">
+                    <label>Mode Sombre</label>
+                    <input type="checkbox" class="toggle-input" id="darkModeToggle" onchange="toggleDarkMode()">
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>🌍 Langue</h3>
+                <select id="languageSelect" onchange="changeLanguage()">
+                    <option value="fr">Français</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+
+            <div class="settings-section">
+                <h3>👤 À propos de moi</h3>
+                <input type="url" id="websiteUrl" placeholder="https://votre-site.com">
+                <textarea id="aboutMe" placeholder="Parlez-vous de vous..." maxlength="300"></textarea>
+                <small id="charCount">0/300</small>
+                <button class="button button-small" onclick="saveAbout()">Sauvegarder</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="title" id="appTitle">⏳ AppExistence</div>
+            <div class="subtitle" id="appSubtitle">Calculatrice d'Existence</div>
+        </div>
+
+        <div class="error" id="errorMsg"></div>
+
+        <div class="card">
+            <label class="label" id="labelNom">📝 Nom de la chose</label>
+            <input type="text" id="nomChose" placeholder="Ex: Notre amitié, La Terre, Mon entreprise...">
+        </div>
+
+        <div class="card">
+            <label class="label" id="labelDebut">📅 Date de début d'existence</label>
+            <input type="date" id="dateDebut">
+        </div>
+
+        <div class="card">
+            <label class="label" id="labelFin">📅 Date de fin d'existence</label>
+            <input type="date" id="dateFin">
+        </div>
+
+        <button class="button" id="btnCalculer" onclick="calculerDuree()">🚀 Calculer la Durée</button>
+
+        <div class="result-container" id="resultContainer">
+            <div class="result-text" id="resultText"></div>
+        </div>
+
+        <div class="footer">
+            <p id="footerText">Créé par <strong>Marco</strong> • v1.0.0</p>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            fr: {
+                appTitle: '⏳ AppExistence',
+                appSubtitle: 'Calculatrice d\'Existence',
+                labelNom: '📝 Nom de la chose',
+                labelDebut: '📅 Date de début d\'existence',
+                labelFin: '📅 Date de fin d\'existence',
+                btnCalculer: '🚀 Calculer la Durée',
+                errorNom: '❌ Veuillez entrer le nom de la chose',
+                errorDate: '❌ La date de début doit être antérieure à la date de fin',
+                saved: '✅ Sauvegardé!',
+            },
+            en: {
+                appTitle: '⏳ AppExistence',
+                appSubtitle: 'Existence Calculator',
+                labelNom: '📝 Name of the thing',
+                labelDebut: '📅 Start date of existence',
+                labelFin: '📅 End date of existence',
+                btnCalculer: '🚀 Calculate Duration',
+                errorNom: '❌ Please enter the name',
+                errorDate: '❌ Start date must be before end date',
+                saved: '✅ Saved!',
+            }
+        };
+
+        let currentLanguage = 'fr';
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js');
+        }
+
+        function loadSettings() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            const language = localStorage.getItem('language') || 'fr';
+            const aboutMe = localStorage.getItem('aboutMe') || '';
+            const websiteUrl = localStorage.getItem('websiteUrl') || '';
+
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeToggle').checked = true;
+            }
+
+            currentLanguage = language;
+            document.getElementById('languageSelect').value = language;
+            document.getElementById('aboutMe').value = aboutMe;
+            document.getElementById('websiteUrl').value = websiteUrl;
+            updateCharCount();
+            updateLanguage();
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+        }
+
+        function changeLanguage() {
+            currentLanguage = document.getElementById('languageSelect').value;
+            localStorage.setItem('language', currentLanguage);
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            const t = translations[currentLanguage];
+            document.getElementById('appTitle').textContent = t.appTitle;
+            document.getElementById('appSubtitle').textContent = t.appSubtitle;
+            document.getElementById('labelNom').textContent = t.labelNom;
+            document.getElementById('labelDebut').textContent = t.labelDebut;
+            document.getElementById('labelFin').textContent = t.labelFin;
+            document.getElementById('btnCalculer').textContent = t.btnCalculer;
+        }
+
+        function updateCharCount() {
+            const count = document.getElementById('aboutMe').value.length;
+            document.getElementById('charCount').textContent = count + '/300';
+        }
+
+        function saveAbout() {
+            const aboutMe = document.getElementById('aboutMe').value;
+            const websiteUrl = document.getElementById('websiteUrl').value;
+            localStorage.setItem('aboutMe', aboutMe);
+            localStorage.setItem('websiteUrl', websiteUrl);
+            alert(translations[currentLanguage].saved);
+        }
+
+        function toggleSettings() {
+            document.getElementById('settingsPanel').classList.toggle('show');
+        }
+
+        document.addEventListener('click', (e) => {
+            const panel = document.getElementById('settingsPanel');
+            const button = document.querySelector('.settings-button');
+            if (!panel.contains(e.target) && !button.contains(e.target)) {
+                panel.classList.remove('show');
+            }
+        });
+
+        const dateDebutInput = document.getElementById('dateDebut');
+        const dateFinInput = document.getElementById('dateFin');
+        
+        const aujourd = new Date();
+        dateFinInput.valueAsDate = aujourd;
+        
+        const ilYaUnAn = new Date();
+        ilYaUnAn.setFullYear(ilYaUnAn.getFullYear() - 1);
+        dateDebutInput.valueAsDate = ilYaUnAn;
+
+        function calculerDuree() {
+            const nomChose = document.getElementById('nomChose').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+            const resultContainer = document.getElementById('resultContainer');
+            const t = translations[currentLanguage];
+
+            if (!nomChose) {
+                errorMsg.textContent = t.errorNom;
+                errorMsg.classList.add('show');
+                resultContainer.classList.remove('show');
+                return;
+            }
+
+            const dateDebut = new Date(dateDebutInput.value);
+            const dateFin = new Date(dateFinInput.value);
+
+            if (dateDebut >= dateFin) {
+                errorMsg.textContent = t.errorDate;
+                errorMsg.classList.add('show');
+                resultContainer.classList.remove('show');
+                return;
+            }
+
+            errorMsg.classList.remove('show');
+
+            const diffMs = dateFin - dateDebut;
+            const diffSecondes = Math.floor(diffMs / 1000);
+            
+            let annees = 0;
+            let tempDate = new Date(dateDebut);
+            while (true) {
+                const nextYear = new Date(tempDate);
+                nextYear.setFullYear(nextYear.getFullYear() + 1);
+                if (nextYear <= dateFin) {
+                    annees++;
+                    tempDate = nextYear;
+                } else break;
+            }
+            
+            const joursApreAnnees = Math.floor((dateFin - tempDate) / (24 * 60 * 60 * 1000));
+            
+            let mois = 0;
+            tempDate = new Date(dateDebut);
+            while (true) {
+                const nextMonth = new Date(tempDate);
+                nextMonth.setMonth(nextMonth.getMonth() + 1);
+                if (nextMonth <= dateFin) {
+                    mois++;
+                    tempDate = nextMonth;
+                } else break;
+            }
+            
+            const joursApresMois = Math.floor((dateFin - tempDate) / (24 * 60 * 60 * 1000));
+            const totalJours = Math.floor(diffSecondes / 86400);
+            const totalSemaines = Math.floor(totalJours / 7);
+            const joursRestants = totalJours % 7;
+            const totalHeures = Math.floor(diffSecondes / 3600);
+            const totalMinutes = Math.floor(diffSecondes / 60);
+            const totalSecondes = diffSecondes;
+            
+            const parts = [];
+            const unitLabels = {
+                fr: { ans: 'ans', an: 'an', mois: 'mois', jour: 'jour', jours: 'jours', semaine: 'semaine', semaines: 'semaines', heure: 'heure', heures: 'heures', minute: 'minute', minutes: 'minutes', seconde: 'seconde', secondes: 'secondes' },
+                en: { ans: 'years', an: 'year', mois: 'month', jour: 'day', jours: 'days', semaine: 'week', semaines: 'weeks', heure: 'hour', heures: 'hours', minute: 'minute', minutes: 'minutes', seconde: 'second', secondes: 'seconds' }
+            };
+            
+            const u = unitLabels[currentLanguage];
+            parts.push(`${annees} ${annees > 1 ? u.ans : u.an} et ${joursApreAnnees} ${joursApreAnnees > 1 ? u.jours : u.jour}`);
+            parts.push(`${mois} ${u.mois} et ${joursApresMois} ${joursApresMois > 1 ? u.jours : u.jour}`);
+            parts.push(`${totalSemaines} ${totalSemaines > 1 ? u.semaines : u.semaine} et ${joursRestants} ${joursRestants > 1 ? u.jours : u.jour}`);
+            parts.push(`${totalJours} ${totalJours > 1 ? u.jours : u.jour}`);
+            parts.push(`${totalHeures} ${totalHeures > 1 ? u.heures : u.heure}`);
+            parts.push(`${totalMinutes} ${totalMinutes > 1 ? u.minutes : u.minute}`);
+            parts.push(`${totalSecondes} ${totalSecondes > 1 ? u.secondes : u.seconde}`);
+
+            const texte = parts.join(', ');
+            const resultText = document.getElementById('resultText');
+            const msgFr = `Votre ${nomChose} a fait ${texte} d'existence.`;
+            const msgEn = `Your ${nomChose} lasted ${texte} of existence.`;
+            resultText.textContent = currentLanguage === 'fr' ? msgFr : msgEn;
+            
+            resultContainer.classList.add('show');
+            parlerResultat(`${nomChose}, a fait ${texte}, d'existence, merci`);
+        }
+
+        function parlerResultat(texte) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(texte);
+                utterance.lang = currentLanguage === 'fr' ? 'fr-FR' : 'en-US';
+                utterance.rate = 1;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        document.getElementById('nomChose').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') calculerDuree();
+        });
+
+        document.getElementById('aboutMe').addEventListener('input', updateCharCount);
+
+        loadSettings();
+    </script>
+</body>
+</html>

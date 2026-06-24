@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "AppExistence",
+    "slug": "appexistence",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTabletMode": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.marco433.appexistence"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b283bf15-acd8-4aaf-aa45-0d1c9ae969cf"
+      }
+    }
+  }
+}

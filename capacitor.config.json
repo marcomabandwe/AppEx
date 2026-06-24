@@ -1,0 +1,16 @@
+{
+  "appId": "com.appexistence.calculator",
+  "appName": "AppExistence",
+  "webDir": ".",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  }
+}

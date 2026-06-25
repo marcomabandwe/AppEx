@@ -18,6 +18,8 @@
             --border-color: #e0e8f0;
             --accent-color: #667eea;
             --accent-dark: #764ba2;
+            --download-btn-bg: #2ecc71;
+            --download-btn-hover: #27ae60;
         }
 
         body.dark-mode {
@@ -26,6 +28,8 @@
             --text-primary: #f0f0f0;
             --text-secondary: #b0b0b0;
             --border-color: #404040;
+            --download-btn-bg: #27ae60;
+            --download-btn-hover: #219653;
         }
 
         * {
@@ -261,13 +265,40 @@
             color: white;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
         .button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        /* Style du bouton de téléchargement de l'APK */
+        .download-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            background: var(--download-btn-bg);
+            border: none;
+            border-radius: 14px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .download-button:hover {
+            background-color: var(--download-btn-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
         }
 
         .button-small {
@@ -411,6 +442,10 @@
 
         <button class="button" id="btnCalculer" onclick="calculerDuree()">🚀 Calculer la Durée</button>
 
+        <a href="android/app/build/outputs/apk/debug/app-debug.apk" class="download-button" id="btnTelecharger" download>
+            🤖 <span id="downloadText">Télécharger l'application Android (.APK)</span>
+        </a>
+
         <div class="result-container" id="resultContainer">
             <div class="result-text" id="resultText"></div>
         </div>
@@ -429,6 +464,7 @@
                 labelDebut: '📅 Date de début d\'existence',
                 labelFin: '📅 Date de fin d\'existence',
                 btnCalculer: '🚀 Calculer la Durée',
+                btnTelecharger: 'Télécharger l\'application Android (.APK)',
                 errorNom: '❌ Veuillez entrer le nom de la chose',
                 errorDate: '❌ La date de début doit être antérieure à la date de fin',
                 saved: '✅ Sauvegardé!',
@@ -440,6 +476,7 @@
                 labelDebut: '📅 Start date of existence',
                 labelFin: '📅 End date of existence',
                 btnCalculer: '🚀 Calculate Duration',
+                btnTelecharger: 'Download Android App (.APK)',
                 errorNom: '❌ Please enter the name',
                 errorDate: '❌ Start date must be before end date',
                 saved: '✅ Saved!',
@@ -490,6 +527,7 @@
             document.getElementById('labelDebut').textContent = t.labelDebut;
             document.getElementById('labelFin').textContent = t.labelFin;
             document.getElementById('btnCalculer').textContent = t.btnCalculer;
+            document.getElementById('downloadText').textContent = t.btnTelecharger;
         }
 
         function updateCharCount() {

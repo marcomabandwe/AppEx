@@ -202,7 +202,7 @@
 
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
         .title {
@@ -215,6 +215,47 @@
         .subtitle {
             font-size: 14px;
             color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        /* Styles mis à jour pour la zone promotionnelle en haut */
+        .promo-container {
+            background: rgba(102, 126, 234, 0.08);
+            border-radius: 12px;
+            padding: 10px 15px;
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            border: 1px dashed rgba(102, 126, 234, 0.3);
+        }
+
+        body.dark-mode .promo-container {
+            background: rgba(243, 156, 18, 0.08);
+            border-color: rgba(243, 156, 18, 0.3);
+        }
+
+        .promo-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-color);
+            text-align: center;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            position: absolute;
+            width: 90%;
+        }
+
+        body.dark-mode .promo-text {
+            color: #f39c12;
+        }
+
+        .promo-text.active {
+            opacity: 1;
+            transform: translateY(0);
+            position: relative;
         }
 
         .card {
@@ -421,6 +462,10 @@
         <div class="header">
             <div class="title" id="appTitle">⏳ AppExistence</div>
             <div class="subtitle" id="appSubtitle">Calculatrice d'Existence</div>
+            
+            <div class="promo-container">
+                <div class="promo-text active" id="promoText">⚡ Calculez instantanément sans connexion Internet !</div>
+            </div>
         </div>
 
         <div class="error" id="errorMsg"></div>
@@ -442,7 +487,7 @@
 
         <button class="button" id="btnCalculer" onclick="calculerDuree()">🚀 Calculer la Durée</button>
 
-        <a href="app-debug.apk" class="download-button" id="btnTelecharger" download>
+        <a href="android/app/build/outputs/apk/debug/app-debug.apk" class="download-button" id="btnTelecharger" download>
             🤖 <span id="downloadText">Télécharger l'application Android (.APK)</span>
         </a>
 
@@ -456,6 +501,23 @@
     </div>
 
     <script>
+        const promoPhrases = {
+            fr: [
+                "⚡ Calculez instantanément sans connexion Internet !",
+                "📱 Plus rapide, fluide et accessible directement sur votre écran d'accueil.",
+                "🔋 Consomme moins de batterie que la version web.",
+                "🔒 Vos données restent 100% privées et sécurisées sur votre téléphone.",
+                "✨ Profitez d'une expérience fluide et sans aucune publicité !"
+            ],
+            en: [
+                "⚡ Calculate instantly without any internet connection!",
+                "📱 Faster, smoother, and accessible right from your home screen.",
+                "🔋 Uses less battery than the web version.",
+                "🔒 Your data stays 100% private and secure on your device.",
+                "✨ Enjoy a smooth experience completely free of ads!"
+            ]
+        };
+
         const translations = {
             fr: {
                 appTitle: '⏳ AppExistence',
@@ -484,6 +546,8 @@
         };
 
         let currentLanguage = 'fr';
+        let promoIndex = 0;
+        let promoInterval;
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('service-worker.js');
@@ -506,6 +570,25 @@
             document.getElementById('websiteUrl').value = websiteUrl;
             updateCharCount();
             updateLanguage();
+            startPromoTicker();
+        }
+
+        function startPromoTicker() {
+            if (promoInterval) clearInterval(promoInterval);
+            
+            const promoElement = document.getElementById('promoText');
+            promoIndex = 0;
+            promoElement.textContent = promoPhrases[currentLanguage][promoIndex];
+            
+            promoInterval = setInterval(() => {
+                promoElement.classList.remove('active');
+                
+                setTimeout(() => {
+                    promoIndex = (promoIndex + 1) % promoPhrases[currentLanguage].length;
+                    promoElement.textContent = promoPhrases[currentLanguage][promoIndex];
+                    promoElement.classList.add('active');
+                }, 4000); 
+            }, 4500); 
         }
 
         function toggleDarkMode() {
@@ -517,6 +600,7 @@
             currentLanguage = document.getElementById('languageSelect').value;
             localStorage.setItem('language', currentLanguage);
             updateLanguage();
+            startPromoTicker();
         }
 
         function updateLanguage() {

@@ -218,7 +218,6 @@
             margin-bottom: 15px;
         }
 
-        /* Styles mis à jour pour la zone promotionnelle en haut */
         .promo-container {
             background: rgba(102, 126, 234, 0.08);
             border-radius: 12px;
@@ -315,7 +314,6 @@
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
         }
 
-        /* Style du bouton de téléchargement de l'APK */
         .download-button {
             display: flex;
             align-items: center;
@@ -580,6 +578,7 @@
             promoIndex = 0;
             promoElement.textContent = promoPhrases[currentLanguage][promoIndex];
             
+            // L'intervalle global passe à 5500ms (5.5 secondes de cycle total)
             promoInterval = setInterval(() => {
                 promoElement.classList.remove('active');
                 
@@ -587,8 +586,8 @@
                     promoIndex = (promoIndex + 1) % promoPhrases[currentLanguage].length;
                     promoElement.textContent = promoPhrases[currentLanguage][promoIndex];
                     promoElement.classList.add('active');
-                }, 4000); 
-            }, 4500); 
+                }, 500); // Laisse 0.5s à l'animation de disparition avant de changer le texte
+            }, 5500); 
         }
 
         function toggleDarkMode() {
